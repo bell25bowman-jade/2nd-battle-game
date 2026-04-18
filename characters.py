@@ -8,6 +8,8 @@ class Character:
         self.attack_power = attack_power
         self.max_health = health
         self.shield = False
+        self.invisible = False
+        self.evading = False
 
     def attack(self, opponent):
        damage = random.randint(self.attack_power - 5, self.attack_power + 5)
@@ -15,6 +17,16 @@ class Character:
        opponent.take_damage(damage)
 
     def take_damage(self, damage):
+        if self.invisible:
+            print(f"{self.name} is invisible! The attack misses!")
+            self.invisible = False
+            return False
+
+        if self.evading:
+            print(f"{self.name} evades the attack!")
+            self.evading = False
+            return False
+
         if self.shield:
             damage = max(0, damage - 10)  # Shield reduces damage by 10
             print(f"{self.name}'s shield absorbs some damage! Damage taken: {damage}")
@@ -24,6 +36,7 @@ class Character:
         self.health -= damage
         if self.health <= 0:
             print(f"{self.name} has been defeated!")
+        return True
     
     def heal(self):
         amount = random.randint(10, 20)
@@ -41,7 +54,12 @@ class Character:
         print("3. Archer") 
         print("4. Paladin")  
 
-        class_choice = input("Enter the number of your class choice: ")
+        while True:
+            class_choice = input("Enter the number of your class choice: ")
+            if class_choice in ['1', '2', '3', '4']:
+                break
+            print("Invalid class choice. Please enter 1, 2, 3, or 4.")
+
         name = input("Enter your character's name: ")
 
         if class_choice == '1':
@@ -50,11 +68,7 @@ class Character:
             return Mage(name)
         elif class_choice == '3':
             return Archer(name)
-        elif class_choice == '4':
-            return Paladin(name)
-        else:
-            print("Invalid choice. Defaulting to Warrior.")
-            return Warrior(name)
+        return Paladin(name)
         
 # Warrior class (inherits from Character)
 class Warrior(Character):
@@ -105,13 +119,19 @@ class EvilWizard(Character):
         
         elif action == 'ice_shard':
             damage = random.randint(self.attack_power, self.attack_power + 10)
-            opponent.take_damage(damage)
-            print(f"{self.name} casts Ice Shard on {opponent.name} for {damage} damage! {opponent.name} is frozen and misses their next turn!")
+            landed = opponent.take_damage(damage)
+            if landed:
+                print(f"{self.name} casts Ice Shard on {opponent.name} for {damage} damage!")
+            else:
+                print(f"{self.name} casts Ice Shard, but {opponent.name} avoids the hit!")
         
         elif action == 'lightning_bolt':
             damage = random.randint(self.attack_power + 10, self.attack_power + 20)
-            opponent.take_damage(damage)
-            print(f"{self.name} casts Lightning Bolt on {opponent.name} for {damage} damage! {opponent.name} is stunned and misses their next turn!")
+            landed = opponent.take_damage(damage)
+            if landed:
+                print(f"{self.name} casts Lightning Bolt on {opponent.name} for {damage} damage!")
+            else:
+                print(f"{self.name} casts Lightning Bolt, but {opponent.name} avoids the hit!")
             
         elif action == 'summon_minions':
             print(f"{self.name} summons minions to attack {opponent.name}!")
@@ -129,7 +149,6 @@ class EvilWizard(Character):
 class Archer(Character):
     def __init__(self, name):
         super().__init__(name, health=120, attack_power=30)
-        self.invisible = False
         
     def quick_shot(self, opponent):
         damage = random.randint(self.attack_power - 10, self.attack_power + 10)
@@ -139,18 +158,13 @@ class Archer(Character):
     def become_invisible(self):
         self.invisible = True
         print(f"{self.name} becomes invisible! The next attack against them will miss.")
-        if self.invisible:
-            print(f"{self.name} is invisible! The attack misses!")
-            self.invisible = False  # Reset invisibility after one attack
     
     def evade(self):
-        self.evade_chance = random.random()
-        if self.evade_chance < 0.3:  # 30% chance to evade
-            print(f"{self.name} evades the attack!")
-            return True
+        if random.random() < 0.3:  # 30% chance to evade next attack
+            self.evading = True
+            print(f"{self.name} prepares to evade the next incoming attack!")
         else:
-            print(f"{self.name} fails to evade the attack!")
-        return False
+            print(f"{self.name} fails to get into an evasive stance!")
 # Paladin class (inherits from Character)
 class Paladin(Character):
     def __init__(self, name):

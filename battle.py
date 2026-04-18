@@ -1,5 +1,7 @@
-from characters import Character, EvilWizard, Paladin, Warrior, Mage, Archer
+from characters import Character, Warrior, Mage, Archer, Paladin, EvilWizard
 
+
+# Battle system
 def battle(player, wizard):
     while wizard.health > 0 and player.health > 0:
         print("\n--- Your Turn ---")
@@ -8,7 +10,11 @@ def battle(player, wizard):
         print("3. Heal")
         print("4. View Stats")
 
-        choice = input("Choose an action: ")
+        while True:
+            choice = input("Choose your action: ")
+            if choice in ['1', '2', '3', '4']:
+                break
+            print("Invalid choice. Please enter 1, 2, 3, or 4.")
 
         if choice == '1':
             player.attack(wizard)
@@ -17,41 +23,62 @@ def battle(player, wizard):
             if isinstance(player, Warrior):
                 print("1. Axe Swing")
                 print("2. Mace Strike")
-                ablility = input("Choose your special ability: ")
-                if ablility == '1':
-                    player.axe_swing(wizard)
-                elif ablility == '2':
-                    player.mace_strike(wizard)
+                while True:
+                    ability = input("Choose your special ability: ")
+                    if ability == '1':
+                        player.axe_swing(wizard)
+                        break
+                    elif ability == '2':
+                        player.mace_strike(wizard)
+                        break
+                    else:
+                        print("Invalid choice. Please enter 1 or 2.")
 
             elif isinstance(player, Mage):
                 print("1. Arcane Blast")
                 print("2. Elemental Shield")
-                ability = input("Choose ability: ")
-
-                if ability == '1':
-                    player.arcane_blast(wizard)
-                elif ability == '2':
-                    player.elemental_shield()
+                while True:
+                    ability = input("Choose ability: ")
+                    if ability == '1':
+                        player.arcane_blast(wizard)
+                        break
+                    elif ability == '2':
+                        player.elemental_shield()
+                        break
+                    else:
+                        print("Invalid choice. Please enter 1 or 2.")
 
             elif isinstance(player, Archer):
                 print("1. Quick Shot")
                 print("2. Evade")
-                ability = input("Choose ability: ")
-
-                if ability == '1':
-                    player.quick_shot(wizard)
-                elif ability == '2':
-                    player.evade()
+                print("3. Become Invisible")
+                while True:
+                    ability = input("Choose ability: ")
+                    if ability == '1':
+                        player.quick_shot(wizard)
+                        break
+                    elif ability == '2':
+                        player.evade()
+                        break
+                    elif ability == '3':
+                        player.become_invisible()
+                        break
+                    else:
+                        print("Invalid choice. Please enter 1, 2, or 3.")
 
             elif isinstance(player, Paladin):
                 print("1. Holy Smite")
                 print("2. Shield")
-                ability = input("Choose ability: ")
-
-                if ability == '1':
-                    player.holy_smite(wizard)
-                elif ability == '2':
-                    player.use_shield()
+                while True:
+                    ability = input("Choose ability: ")
+                    if ability == '1':
+                        player.holy_smite(wizard)
+                        break
+                    elif ability == '2':
+                        player.use_shield()
+                        break
+                    else:
+                        print("Invalid choice. Please enter 1 or 2.")
 
         elif choice == '3':
             player.heal()
@@ -60,24 +87,16 @@ def battle(player, wizard):
             player.display_stats()
             wizard.display_stats()
             continue
-
-        else:
-            print("Invalid choice.")
-            continue
       
         if wizard.health > 0:
             wizard.regenerate()
-            wizard.attack(player)
-        else:
-            wizard.health <= 0
-            print(f"The wizard {wizard.name} has been defeated by {player.name}!")
+            wizard.cast_spell(player)
 
         if player.health <= 0:
-            print(f"{player.name} has been defeated!")
             break
 
     if wizard.health <= 0:
-        print(f"The wizard {wizard.name} has been defeated by {player.name}!")
+        print(f"{wizard.name} has been defeated by {player.name}!")
 
 def main():
     player = Character.create_choice()
